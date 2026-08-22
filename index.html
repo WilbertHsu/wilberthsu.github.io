@@ -278,6 +278,7 @@ This structure separates the *temporal* (Itinerary) from the *categorical* (Food
             <!-- Filters -->
             <div class="flex flex-wrap gap-2 mb-6" id="foodFilters">
                 <button class="filter-btn active px-4 py-2 rounded-full bg-brand-600 text-white text-sm font-medium transition-colors" data-filter="all">全部顯示</button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 text-sm font-medium transition-colors" data-filter="早餐/輕食">早餐/輕食</button>
                 <button class="filter-btn px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 text-sm font-medium transition-colors" data-filter="湯飯/麵食">湯飯/麵食</button>
                 <button class="filter-btn px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 text-sm font-medium transition-colors" data-filter="烤肉/海鮮">烤肉/海鮮</button>
                 <button class="filter-btn px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 text-sm font-medium transition-colors" data-filter="炸雞/點心">炸雞/點心</button>
@@ -316,7 +317,7 @@ This structure separates the *temporal* (Itinerary) from the *categorical* (Food
     </main>
 
     <footer class="bg-slate-800 text-slate-400 py-8 text-center text-sm">
-        <p>Wilbert Hsu &copy; 2026.</p>
+        <p>客製化行程提案 &copy; 2026. 祝您有一趟美好的釜山親子之旅！</p>
     </footer>
 
     <!-- JavaScript 邏輯 -->
@@ -331,44 +332,44 @@ This structure separates the *temporal* (Itinerary) from the *categorical* (Food
                     { time: '09:35', location: '釜山金海機場 (PUS)', action: '抵達、入境', transport: '🚕 計程車 (~45分)', duration: '1 hr', map: 'https://www.google.com/maps/search/?api=1&query=Gimhae+International+Airport', big5: false },
                     { time: '11:00', location: '海雲台貝斯特韋斯特酒店', action: '寄放行李、稍作休息', transport: '🚶 步行 (~10分)', duration: '0.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Best+Western+Haeundae+Hotel', big5: false },
                     { time: '11:45', location: '海雲台傳統市場', action: '午餐：豬肉湯飯 (小孩可吃原味，不加辣醬)', transport: '🚶 步行 (~5分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Haeundae+Traditional+Market', big5: false },
-                    { time: '13:30', location: 'Sealife 釜山水族館', action: '室內觀賞海洋生物，避開午後高溫', transport: '🚶 步行 (~10分)', duration: '2.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Sea+Life+Busan+Aquarium', big5: true },
-                    { time: '16:30', location: '海雲台海水浴場', action: '沙灘踏浪、小孩放電', transport: '🚶 步行', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Haeundae+Beach', big5: false },
+                    { time: '13:30', location: 'Sealife 釜山水族館', action: '室內觀賞海洋生物，避開午後高溫', transport: '🚶 步行 (~10分)', duration: '2 hr', map: 'https://www.google.com/maps/search/?api=1&query=Sea+Life+Busan+Aquarium', big5: true },
+                    { time: '16:00', location: 'Busan X the Sky', action: '100樓觀景台！從高空俯瞰海雲台絕美海景', transport: '🚶 步行 (~15分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Busan+X+the+Sky', big5: true },
                     { time: '18:00', location: '海雲台周邊商圈', action: '晚餐：韓式不辣烤肉 (烤五花肉、烤韓牛)', transport: '🚶 步行回飯店', duration: '2 hr', map: 'https://www.google.com/maps/search/?api=1&query=Haeundae+BBQ', big5: false }
                 ]
             },
             {
-                day: 2, title: '樂園暢玩與海雲台之夜', date: '8/27 (四)',
+                day: 2, title: '樂園暢玩', date: '8/27 (四)',
                 events: [
                     { time: '09:30', location: '飯店出發', action: '前往奧西利亞(Osiria)觀光園區', transport: '🚕 計程車 (~30分)', duration: '-', map: '', big5: false },
-                    { time: '10:00', location: 'Skyline Luge 釜山', action: '趁早人少先玩斜坡滑車 (小孩可與大人共乘或獨自駕駛)', transport: '🚶 步行', duration: '2 hr', map: 'https://www.google.com/maps/search/?api=1&query=Skyline+Luge+Busan', big5: true },
-                    { time: '12:00', location: '奧西利亞園區', action: '午餐：Luge周邊或樂天世界園區內餐廳/輕食', transport: '🚶 步行 (~10分)', duration: '1 hr', map: '', big5: false },
-                    { time: '13:00', location: '釜山樂天世界', action: '童話風主題樂園，下午時段暢玩，適合8歲小孩', transport: '🚶 步行', duration: '4 hr', map: 'https://www.google.com/maps/search/?api=1&query=Lotte+World+Adventure+Busan', big5: true },
-                    { time: '17:30', location: '海雲台商圈', action: '晚餐：橋村炸雞 (推薦蜂蜜口味-不辣) 或 炸豬排', transport: '🚕 計程車回海雲台 (~30分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Kyochon+Chicken+Haeundae', big5: false },
-                    { time: '19:00', location: '海雲台海水浴場', action: '夜晚沙灘散步、看海雲台夜景，享受鬆散的親子時光', transport: '🚶 步行回飯店', duration: '1 hr', map: 'https://www.google.com/maps/search/?api=1&query=Haeundae+Beach', big5: false }
+                    { time: '10:00', location: 'Skyline Luge 釜山', action: '斜坡滑車 (早上人潮較少，避開排隊尖峰)', transport: '🚶 步行', duration: '2.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Skyline+Luge+Busan', big5: true },
+                    { time: '12:30', location: '樂天世界內/周邊', action: '午餐：園區內餐廳或周邊輕食', transport: '🚶 步行 (~10分)', duration: '1 hr', map: '', big5: false },
+                    { time: '13:30', location: '釜山樂天世界', action: '童話風主題樂園，下午繼續放電', transport: '🚶 步行', duration: '4 hr', map: 'https://www.google.com/maps/search/?api=1&query=Lotte+World+Adventure+Busan', big5: true },
+                    { time: '17:30', location: '海雲台商圈', action: '晚餐：橋村炸雞 (推薦蜂蜜口味-不辣)', transport: '🚕 計程車回海雲台 (~30分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Kyochon+Chicken+Haeundae', big5: false },
+                    { time: '19:30', location: '海雲台周邊', action: '夜晚散步、享受鬆散的親子時光', transport: '🚶 步行回飯店', duration: '1 hr', map: 'https://www.google.com/maps/search/?api=1&query=Haeundae+Beach', big5: false }
                 ]
             },
             {
-                day: 3, title: '海岸列車與溫泉放鬆', date: '8/28 (五)',
+                day: 3, title: '雙向列車體驗與溫泉放鬆', date: '8/28 (五)',
                 events: [
-                    { time: '10:00', location: '貝斯特韋斯特酒店', action: '辦理退房，行李寄放櫃台', transport: '🚶 步行 (~15分)', duration: '-', map: '', big5: false },
-                    { time: '10:30', location: '尾浦站 (天空膠囊列車)', action: '搭乘海岸膠囊列車前往青沙浦 (需提前上網預約)', transport: '🚡 膠囊列車 (~30分)', duration: '1 hr', map: 'https://www.google.com/maps/search/?api=1&query=Haeundae+Blueline+Park+Mipo', big5: false },
-                    { time: '11:30', location: '青沙浦紅白燈塔', action: '拍照打卡、海景咖啡廳', transport: '🚶 步行', duration: '1 hr', map: 'https://www.google.com/maps/search/?api=1&query=Cheongsapo+Daritdol+Observatory', big5: false },
-                    { time: '12:30', location: '青沙浦海鮮街', action: '午餐：烤貝類 (原味不辣) + 海帶湯', transport: '🚕 計程車 (~15分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Cheongsapo+Seafood', big5: false },
-                    { time: '14:30', location: 'Club D OASIS', action: '頂級海景水上樂園與汗蒸幕 (小孩玩水、大人放鬆)', transport: '🚕 計程車回飯店提行李', duration: '3.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Club+D+Oasis', big5: true },
-                    { time: '18:30', location: '霍默斯酒店 (廣安里)', action: '辦理入住、休息', transport: '🚶 步行', duration: '1 hr', map: 'https://www.google.com/maps/search/?api=1&query=Hotel+Homers+Busan', big5: false },
+                    { time: '09:00', location: '貝斯特韋斯特酒店', action: '辦理退房，行李寄放，搭車前往青沙浦', transport: '🚕 計程車 (~15分)', duration: '-', map: '', big5: false },
+                    { time: '10:00', location: '海岸列車 (青沙浦站)', action: '搭乘海岸列車前往尾浦 (欣賞沿海風光)', transport: '🚊 海岸列車 (~15分)', duration: '0.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Cheongsapo+Station', big5: false },
+                    { time: '10:30', location: '尾浦站周邊 (海雲台)', action: '尾浦散步拍照，早午餐/輕食咖啡廳休息', transport: '🚶 步行', duration: '2 hr', map: 'https://www.google.com/maps/search/?api=1&query=Mipo+Station', big5: false },
+                    { time: '13:00', location: '天空膠囊列車 (尾浦站)', action: '搭乘天空膠囊列車返回青沙浦 (絕美高空海景)', transport: '🚡 膠囊列車 (~30分)', duration: '1 hr', map: 'https://www.google.com/maps/search/?api=1&query=Haeundae+Blueline+Park+Mipo', big5: false },
+                    { time: '14:00', location: '青沙浦', action: '紅白燈塔打卡，稍作停留後搭車回海雲台LCT', transport: '🚕 計程車 (~15分)', duration: '0.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Cheongsapo+Daritdol+Observatory', big5: false },
+                    { time: '14:45', location: 'Club D OASIS', action: '頂級海景水上樂園與汗蒸幕 (小孩玩水、大人放鬆)', transport: '🚕 先回飯店提行李再前往', duration: '3 hr', map: 'https://www.google.com/maps/search/?api=1&query=Club+D+Oasis', big5: true },
+                    { time: '18:30', location: '霍默斯酒店 (廣安里)', action: '辦理入住、休息', transport: '🚕 計程車 (~20分)', duration: '1 hr', map: 'https://www.google.com/maps/search/?api=1&query=Hotel+Homers+Busan', big5: false },
                     { time: '19:30', location: '廣安里海水浴場', action: '晚餐：韓式烤牛肉 (Bulgogi - 甜味) 賞廣安大橋夜景', transport: '-', duration: '2 hr', map: 'https://www.google.com/maps/search/?api=1&query=Gwangalli+Beach', big5: false }
                 ]
             },
             {
-                day: 4, title: '活力探索與絕美高空大秀', date: '8/29 (六)',
+                day: 4, title: '文化、藝術與活力探索', date: '8/29 (六)',
                 events: [
-                    { time: '09:30', location: '西面商圈', action: 'Running Man 體驗館 (讓小孩盡情消耗體力)', transport: '🚕 計程車 (~25分)', duration: '2 hr', map: 'https://www.google.com/maps/search/?api=1&query=Running+Man+Busan', big5: true },
-                    { time: '11:45', location: '西面商圈', action: '午餐：人蔘雞湯 (營養且完全不辣，補充體力)', transport: '🚶 步行 (~5分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Samgyetang+Seomyeon', big5: false },
-                    { time: '13:30', location: '松島海上纜車 & 天空步道', action: '搭乘透明水晶車廂，漫步海上步道', transport: '🚕 計程車 (~25分)', duration: '2 hr', map: 'https://www.google.com/maps/search/?api=1&query=Songdo+Marine+Cable+Car', big5: false },
-                    { time: '16:00', location: 'ARTE MUSEUM BUSAN (影島)', action: '沉浸式光影藝術展 (室內冷氣房，視覺饗宴)', transport: '🚕 計程車 (~15分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Arte+Museum+Busan', big5: true },
-                    { time: '18:15', location: 'Busan X the Sky', action: '100樓觀景台！傍晚登頂，一次收齊夕陽與無敵夜景 (行經跨海大橋風景極佳)', transport: '🚕 計程車 (~40分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Busan+X+the+Sky', big5: true },
-                    { time: '20:00', location: '廣安里海水浴場 (周邊)', action: '晚餐：清淡海鮮刀削麵或排骨湯，並慢慢移動至沙灘', transport: '🚕 計程車 (~20分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Gwangalli+Food', big5: false },
-                    { time: '21:30', location: '廣安里海水浴場 (或飯店房間)', action: '等待 22:00 M無人機燈光秀 (每週六)', transport: '🚶 步行', duration: '1 hr', map: 'https://www.google.com/maps/search/?api=1&query=Gwangalli+Beach', big5: false }
+                    { time: '09:30', location: '甘川文化村', action: '韓服體驗、穿梭彩色小巷尋找小王子', transport: '🚕 計程車 (~35分)', duration: '2 hr', map: 'https://www.google.com/maps/search/?api=1&query=Gamcheon+Culture+Village', big5: false },
+                    { time: '12:00', location: '國際市場 (南浦洞)', action: '午餐：市場內不辣美食 (如魚糕、冷麵) 與逛街', transport: '🚕 計程車 (~10分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Gukje+Market', big5: false },
+                    { time: '14:00', location: 'ARTE MUSEUM BUSAN (影島)', action: '沉浸式光影藝術展 (絕佳視覺饗宴，冷氣房避暑)', transport: '🚕 計程車 (~15分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Arte+Museum+Busan', big5: true },
+                    { time: '16:30', location: 'Running Man 體驗館 (西面)', action: '室內闖關活動，讓小孩盡情消耗體力', transport: '🚕 計程車 (~25分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Running+Man+Busan', big5: true },
+                    { time: '18:30', location: '西面商圈', action: '晚餐：人蔘雞湯 (營養完全不辣) 或 炸醬麵', transport: '🚕 計程車回廣安里 (~30分)', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Samgyetang+Seomyeon', big5: false },
+                    { time: '20:30', location: '廣安里海水浴場 (或飯店房間)', action: '散步休息，等待 22:00 M無人機燈光秀', transport: '-', duration: '1.5 hr', map: 'https://www.google.com/maps/search/?api=1&query=Gwangalli+Beach', big5: false }
                 ]
             },
             {
@@ -383,6 +384,8 @@ This structure separates the *temporal* (Itinerary) from the *categorical* (Food
         ];
 
         const foodData = [
+            { name: 'Isaac Toast (이삭토스트)', category: '早餐/輕食', location: '海雲台/西面等各區', desc: '韓國超人氣國民早餐！現烤奶油吐司夾入豐富餡料，特製甜醬深受小孩喜愛。', map: 'https://www.google.com/maps/search/?api=1&query=Isaac+Toast+Busan' },
+            { name: 'Egg Drop (에그드랍)', category: '早餐/輕食', location: '海雲台/西面', desc: '人氣滑蛋吐司，布里歐麵包外酥內軟，滑嫩炒蛋與起司的搭配是無辣絕佳選擇。', map: 'https://www.google.com/maps/search/?api=1&query=Egg+Drop+Busan' },
             { name: '豬肉湯飯 (돼지국밥)', category: '湯飯/麵食', location: '海雲台/西面皆有', desc: '釜山必吃！點餐時告知「不要放辣醬 (다대기 빼주세요)」，大骨白湯非常適合小孩拌飯吃。', map: 'https://www.google.com/maps/search/?api=1&query=Pork+Rice+Soup+Busan' },
             { name: '人蔘雞湯 (삼계탕)', category: '湯飯/麵食', location: '南浦洞/西面', desc: '將雞肉燉得軟爛入味，雞肚子裡有糯米，湯頭濃郁不辣，營養價值高。', map: 'https://www.google.com/maps/search/?api=1&query=Samgyetang+Busan' },
             { name: '鮑魚粥 (전복죽)', category: '湯飯/麵食', location: '海雲台/機張', desc: '溫和養胃的選擇，通常會搭配蒸餃，是小孩接受度極高的餐點。', map: 'https://www.google.com/maps/search/?api=1&query=Abalone+Porridge+Busan' },
@@ -550,7 +553,7 @@ This structure separates the *temporal* (Itinerary) from the *categorical* (Food
                     labels: ['Day 1 (機場/海雲台)', 'Day 2 (機張樂園)', 'Day 3 (跨區換飯店)', 'Day 4 (市區多景點)', 'Day 5 (赴機場)'],
                     datasets: [{
                         label: '預估計程車資 (KRW)',
-                        data: [35000, 40000, 30000, 85000, 25000],
+                        data: [35000, 35000, 45000, 85000, 25000],
                         backgroundColor: 'rgba(14, 165, 233, 0.7)', // brand-500 with opacity
                         borderColor: '#0ea5e9',
                         borderWidth: 1,
