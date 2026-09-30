@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2027 曼谷幫過年泰國Mini Tour行程比較與決策系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdf8f6',
+                            100: '#f2e8e1',
+                            200: '#e5d1c5',
+                            500: '#c87d55',
+                            600: '#b4653a',
+                            700: '#944e2b',
+                            800: '#783e25',
+                            900: '#633522',
+                        },
+                        sand: {
+                            50: '#fbfaf8',
+                            100: '#f7f4ef',
+                            200: '#ece5d8',
+                            300: '#ded2be',
+                            800: '#4a443b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Embedded custom CSS for mandatory Chart Container responsive bounds */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        /* Custom Scrollbar for better UX */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1ede6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c87d55;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-sand-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Warm Neutral Harmony (Warm Sand, Amber Brown, Deep Terracotta & Slate Accent) -->
+    <!-- Application Structure Plan:
+        1. Navigation & Hero Dashboard: Top high-level KPIs and quick key features of Mini Tour.
+        2. Visual Data Analytics: Interactive Chart.js visual comparisons (Price vs Flight, Days vs Destinations).
+        3. Dynamic Filter & Product Catalog: Interactive filters (Flight type, Outbound city, Departure Date, Region) with Tour Cards linking directly to official product pages.
+        4. Comprehensive Comparison Matrix: Sortable/Filterable tabular deep dive across 11 packages with modal detail views.
+        5. Smart Tour Decision Recommendation Tool: Step-by-step recommendation wizard helping users pinpoint their ideal tour.
+        6. Deep Qualitative Analysis & Report Insights: Explaining core differentiation strategies (VIP Van, No Shopping, Michelin Dining, Mini-Tour Concept).
+    -->
+    <!-- Visualization & Content Choices:
+        - Tour Price & Airline Chart: Grouped Bar Chart via Chart.js Canvas to compare FSC vs LCC pricing.
+        - Destination Distribution: Donut Chart via Chart.js Canvas for clear regional slice allocation.
+        - Interactive Comparison Table: Clean HTML/Tailwind table with JS dynamic sorting and search filtering.
+        - Guided Recommendation Wizard: Interactive JS state-driven questionnaire with immediate result targeting.
+        - CONFIRMATION: NO SVG used. NO Mermaid JS used. Relying purely on Tailwind UI shapes, HTML Unicode, and Chart.js Canvas.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header Navigation -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-sand-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-brand-600 text-white font-bold px-3 py-1 rounded-lg text-sm tracking-wide">走跳旅遊 曼谷幫</span>
+                    <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">2027 春節泰國 Mini Tour 決策系統</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6 text-sm font-medium">
+                    <a href="#overview" class="text-slate-600 hover:text-brand-600 transition-colors">數據總覽</a>
+                    <a href="#filter-section" class="text-slate-600 hover:text-brand-600 transition-colors">行程篩選</a>
+                    <a href="#matrix-section" class="text-slate-600 hover:text-brand-600 transition-colors">全對比矩陣</a>
+                    <a href="#advisor-section" class="text-slate-600 hover:text-brand-600 transition-colors">智慧推薦</a>
+                    <a href="#insights-section" class="text-slate-600 hover:text-brand-600 transition-colors">深度戰略剖析</a>
+                </nav>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-slate-900 focus:outline-none text-2xl">
+                        &#9776;
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-sand-200 bg-sand-50 px-4 pt-2 pb-4 space-y-2 text-sm font-medium">
+            <a href="#overview" class="block py-1 text-slate-700">數據總覽</a>
+            <a href="#filter-section" class="block py-1 text-slate-700">行程篩選</a>
+            <a href="#matrix-section" class="block py-1 text-slate-700">全對比矩陣</a>
+            <a href="#advisor-section" class="block py-1 text-slate-700">智慧推薦</a>
+            <a href="#insights-section" class="block py-1 text-slate-700">深度戰略剖析</a>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- Hero & Introductory Banner -->
+        <section class="bg-gradient-to-br from-brand-700 to-brand-900 text-white rounded-2xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+            <div class="relative z-10 max-w-3xl space-y-4">
+                <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold tracking-wider text-brand-100">
+                    <span>&#127881; 2027 丁未年春節（2/4 ~ 2/7 出發）專案</span>
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                    羊羊得意：11 條旗艦泰國過年行程深度量化與比較
+                </h2>
+                <p class="text-sand-100 text-sm sm:text-base leading-relaxed">
+                    本系統彙整曼谷幫 2027 年春節專案所有產品資料，涵蓋傳統航空與廉價航空、曼谷大城芭達雅黃金三角、華欣皇室度假、泰北米其林美食及高雄直飛等多元組合。透過數據化比對與互動篩選，助您快速掌握團型差異並鎖定最佳方案。
+                </p>
+                <div class="pt-2 flex flex-wrap gap-3">
+                    <a href="#filter-section" class="bg-white text-brand-800 font-bold px-5 py-2.5 rounded-xl shadow hover:bg-brand-50 transition-all text-sm inline-block">
+                        立即開始篩選行程
+                    </a>
+                    <a href="#advisor-section" class="bg-brand-600 text-white border border-brand-400 font-semibold px-5 py-2.5 rounded-xl hover:bg-brand-500 transition-all text-sm inline-block">
+                        &#129504; 30秒性價比測驗
+                    </a>
+                </div>
+            </div>
+            <!-- Decorative Background Accent -->
+            <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        </section>
+
+        <!-- KPI Metrics Grid -->
+        <section id="overview" class="space-y-4">
+            <div class="border-l-4 border-brand-600 pl-3">
+                <h3 class="text-xl font-bold text-slate-900">核心數據與服務特點總覽</h3>
+                <p class="text-xs text-slate-500">本節說明此專案之總體規格與四大服務承諾。</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-sand-200 shadow-sm flex flex-col justify-between">
+                    <div class="text-xs font-semibold text-slate-500">總行程產品數</div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-brand-600 mt-2">11 <span class="text-base font-normal text-slate-600">個旗艦團</span></div>
+                    <div class="text-xs text-slate-400 mt-2">涵蓋 6 大區域動線</div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-sand-200 shadow-sm flex flex-col justify-between">
+                    <div class="text-xs font-semibold text-slate-500">成團門檻與服務</div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-2">8 <span class="text-base font-normal text-slate-600">人即自成團</span></div>
+                    <div class="text-xs text-brand-600 font-medium mt-2">&#10004; 全程豪華 VIP 保姆車</div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-sand-200 shadow-sm flex flex-col justify-between">
+                    <div class="text-xs font-semibold text-slate-500">團費定價區間</div>
+                    <div class="text-xl sm:text-2xl font-extrabold text-slate-800 mt-2">$43.8K - $50.8K</div>
+                    <div class="text-xs text-emerald-600 font-medium mt-2">早鳥現折 NT$3,000/人</div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-sand-200 shadow-sm flex flex-col justify-between">
+                    <div class="text-xs font-semibold text-slate-500">品質雙重保障</div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-2">100%</div>
+                    <div class="text-xs text-slate-500 mt-2">無購物站 + 加贈 4G 實體網卡</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visual Analytics Section (Chart.js) -->
+        <section class="bg-white p-6 rounded-2xl border border-sand-200 shadow-sm space-y-6">
+            <div class="border-l-4 border-brand-600 pl-3">
+                <h3 class="text-xl font-bold text-slate-900">行程視覺化交叉分析</h3>
+                <p class="text-xs text-slate-500">本區塊將 11 個團型依定價、航空類別及目的地板塊進行動態圖表呈現，利於快速進行價格與規模比較。</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <!-- Chart 1: Price & Airline Bar Chart -->
+                <div class="space-y-3">
+                    <h4 class="text-sm font-bold text-slate-800 text-center">各團體定價與航空型態比對 (NT$)</h4>
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 text-center">藍色代表傳統航空 (FSC)，橘色代表廉價航空 (LCC)。早鳥優惠折 NT$3,000。</p>
+                </div>
+
+                <!-- Chart 2: Destination Slice Donut Chart -->
+                <div class="space-y-3">
+                    <h4 class="text-sm font-bold text-slate-800 text-center">專案路線板塊分布 (團數占比)</h4>
+                    <div class="chart-container">
+                        <canvas id="regionChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 text-center">「曼大芭」黃金三角為絕對主力，華欣與泰北則主打特色深度遊。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Filter & Interactive Product Cards Grid -->
+        <section id="filter-section" class="space-y-6">
+            <div class="border-l-4 border-brand-600 pl-3">
+                <h3 class="text-xl font-bold text-slate-900">多功能行程動態篩選器</h3>
+                <p class="text-xs text-slate-500">本節提供多重條件過濾，點擊篩選標籤可即時更新顯示符合條件的行程與其官方詳細連結。</p>
+            </div>
+
+            <!-- Filter Control Panel -->
+            <div class="bg-sand-100 p-5 rounded-2xl border border-sand-200 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Airline Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">航空類型</label>
+                        <select id="filter-airline" class="w-full bg-white border border-sand-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="ALL">全部航空 (FSC / LCC)</option>
+                            <option value="FSC">傳統航空 (華航/泰航/長榮)</option>
+                            <option value="LCC">廉價航空 (亞航/泰獅航)</option>
+                        </select>
+                    </div>
+                    <!-- Departure City Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">出發地點</label>
+                        <select id="filter-departure" class="w-full bg-white border border-sand-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="ALL">全部出發地</option>
+                            <option value="TPE">台北 (桃園)</option>
+                            <option value="KHH">高雄 (小港)</option>
+                        </select>
+                    </div>
+                    <!-- Date Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">出發日期 (2027年)</label>
+                        <select id="filter-date" class="w-full bg-white border border-sand-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="ALL">全部出發日</option>
+                            <option value="2/4">2/4 (小年夜前)</option>
+                            <option value="2/5">2/5 (正宗除夕)</option>
+                            <option value="2/7">2/7 (初二彈性)</option>
+                        </select>
+                    </div>
+                    <!-- Region Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">核心目的地板塊</label>
+                        <select id="filter-region" class="w-full bg-white border border-sand-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="ALL">全區域路線</option>
+                            <option value="曼大芭">曼谷＋大城＋芭達雅</option>
+                            <option value="華欣">曼谷＋華欣度假</option>
+                            <option value="泰北">清邁＋清萊 (泰北)</option>
+                            <option value="都會">曼谷＋芭達雅 (短天數/都會)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-sand-200">
+                    <span id="filtered-count" class="text-xs font-bold text-brand-700">共顯示 11 個符合條件的行程</span>
+                    <button id="reset-filters" class="text-xs text-slate-500 hover:text-brand-600 underline">重置所有篩選條件</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Tour Grid -->
+            <div id="tour-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JavaScript will dynamically render tour cards here -->
+            </div>
+        </section>
+
+        <!-- Comprehensive Matrix Comparison Table Section -->
+        <section id="matrix-section" class="space-y-4">
+            <div class="border-l-4 border-brand-600 pl-3">
+                <h3 class="text-xl font-bold text-slate-900">11 團全方位綜合比較矩陣</h3>
+                <p class="text-xs text-slate-500">本表格匯整各團詳細參數，支援表頭排序與搜尋，點擊可開啟詳細行程介紹。</p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-sand-200 shadow-sm overflow-hidden">
+                <div class="p-4 bg-sand-50 border-b border-sand-200 flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <input type="text" id="table-search" placeholder="&#128092; 關鍵字搜尋 (例如: 華航, 泰北, 米其林, 高雄)..." 
+                           class="w-full sm:w-80 bg-white border border-sand-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <div class="text-xs text-slate-500">
+                        點擊欄位名稱即可進行單向排序
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead class="bg-sand-100 border-b border-sand-200 font-bold text-slate-700 select-none">
+                            <tr>
+                                <th class="p-3 cursor-pointer hover:text-brand-600" onclick="sortTable('id')">團型 ⇅</th>
+                                <th class="p-3 cursor-pointer hover:text-brand-600" onclick="sortTable('route')">主要路線 ⇅</th>
+                                <th class="p-3 cursor-pointer hover:text-brand-600" onclick="sortTable('date')">出發日 ⇅</th>
+                                <th class="p-3 cursor-pointer hover:text-brand-600" onclick="sortTable('days')">天數 ⇅</th>
+                                <th class="p-3 cursor-pointer hover:text-brand-600" onclick="sortTable('airline')">航空 / 出發 ⇅</th>
+                                <th class="p-3 cursor-pointer hover:text-brand-600" onclick="sortTable('price')">參考團費 (NT) ⇅</th>
+                                <th class="p-3">核心住宿亮點</th>
+                                <th class="p-3 text-center">產品頁連結</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrix-table-body" class="divide-y divide-sand-200">
+                            <!-- Dynamically Populated Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Smart Recommendation Decision Advisor Wizard -->
+        <section id="advisor-section" class="bg-gradient-to-r from-sand-100 to-sand-200 p-6 sm:p-8 rounded-2xl border border-sand-300 space-y-6">
+            <div class="border-l-4 border-brand-600 pl-3">
+                <h3 class="text-xl font-bold text-slate-900">&#129504; 30秒智慧選擇助手 (Tour Recommendation Wizard)</h3>
+                <p class="text-xs text-slate-600">不確定選哪一團？請點選您的需求偏好，系統將自動為您推薦最符合的過年行程！</p>
+            </div>
+
+            <div id="wizard-container" class="bg-white p-6 rounded-xl border border-sand-200 space-y-6">
+                <!-- Question 1 -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-800">1. 您的偏好出發地點與航空公司類別？</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button onclick="setWizardPref('flight', 'FSC_TPE')" class="wiz-btn-flight text-left border border-sand-300 p-3 rounded-xl hover:border-brand-500 text-xs">
+                            <div class="font-bold">台北出發 ✕ 傳統航空</div>
+                            <div class="text-slate-500">重視託運行李與飛行舒適度</div>
+                        </button>
+                        <button onclick="setWizardPref('flight', 'LCC_TPE')" class="wiz-btn-flight text-left border border-sand-300 p-3 rounded-xl hover:border-brand-500 text-xs">
+                            <div class="font-bold">台北出發 ✕ 廉價航空</div>
+                            <div class="text-slate-500">高 CP 值、預算彈性</div>
+                        </button>
+                        <button onclick="setWizardPref('flight', 'KHH')" class="wiz-btn-flight text-left border border-sand-300 p-3 rounded-xl hover:border-brand-500 text-xs">
+                            <div class="font-bold">高雄出發 (小港)</div>
+                            <div class="text-slate-500">中南部南部鄉親剛性首選</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-800">2. 您最期待的過年旅遊風格？</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <button onclick="setWizardPref('style', 'CLASSIC')" class="wiz-btn-style text-left border border-sand-300 p-3 rounded-xl hover:border-brand-500 text-xs">
+                            <div class="font-bold">經典全能型</div>
+                            <div class="text-slate-500">曼谷大城芭達雅一次滿足</div>
+                        </button>
+                        <button onclick="setWizardPref('style', 'RESORT')" class="wiz-btn-style text-left border border-sand-300 p-3 rounded-xl hover:border-brand-500 text-xs">
+                            <div class="font-bold">皇室慢活度假</div>
+                            <div class="text-slate-500">華欣五星飯店、水上市場</div>
+                        </button>
+                        <button onclick="setWizardPref('style', 'NORTH')" class="wiz-btn-style text-left border border-sand-300 p-3 rounded-xl hover:border-brand-500 text-xs">
+                            <div class="font-bold">泰北文化與美食</div>
+                            <div class="text-slate-500">清邁清萊、米其林饗宴</div>
+                        </button>
+                        <button onclick="setWizardPref('style', 'URBAN')" class="wiz-btn-style text-left border border-sand-300 p-3 rounded-xl hover:border-brand-500 text-xs">
+                            <div class="font-bold">短天數 / 樂園</div>
+                            <div class="text-slate-500">不衝拉車，聚焦曼芭享樂</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recommendation Output -->
+                <div id="wizard-result" class="hidden p-4 bg-brand-50 border border-brand-200 rounded-xl space-y-3">
+                    <div class="flex items-center space-x-2 text-brand-800 font-bold text-sm">
+                        <span>&#127942; 系統為您配對的最佳行程：</span>
+                    </div>
+                    <div id="wizard-result-content" class="text-xs text-slate-700"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deep Qualitative Report Analysis Section -->
+        <section id="insights-section" class="bg-white p-6 sm:p-8 rounded-2xl border border-sand-200 shadow-sm space-y-8">
+            <div class="border-l-4 border-brand-600 pl-3">
+                <h3 class="text-xl font-bold text-slate-900">曼谷幫「羊羊得意」專案戰略深度分析報告</h3>
+                <p class="text-xs text-slate-500">本區塊摘錄來源報告的核心洞察，解構微型包團（Mini Tour）如何在 2027 年泰國春節旅遊紅海中建立品牌護城河。</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                <!-- Insight 1 -->
+                <div class="space-y-3 bg-sand-50 p-5 rounded-xl border border-sand-200">
+                    <h4 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <span class="bg-brand-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">1</span>
+                        微型跟團 (Mini Tour) 商業模式革新
+                    </h4>
+                    <p>
+                        2027 春節檔期以「滿 8 人即可自己組一團」為核心，打破傳統大團併團、行程走馬看花的痛點。透過自選出發日與私人包車，旅遊形態由傳統批發轉型為「私人顧問與後勤管家」，精準滿足親友獨享與高隱私需求。
+                    </p>
+                </div>
+
+                <!-- Insight 2 -->
+                <div class="space-y-3 bg-sand-50 p-5 rounded-xl border border-sand-200">
+                    <h4 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <span class="bg-brand-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">2</span>
+                        全程保姆車 (VIP Van) 運載優勢
+                    </h4>
+                    <p>
+                        捨棄 35-45 座大型遊覽車，全線採用 9-12 座豪華保姆車（VIP Van）。在曼谷與芭達雅狹窄巷弄及塞車路段具備極高機動性，大幅減少等待無效時間，並在車內打造高私密性、免除強迫購物推銷的舒適空間。
+                    </p>
+                </div>
+
+                <!-- Insight 3 -->
+                <div class="space-y-3 bg-sand-50 p-5 rounded-xl border border-sand-200">
+                    <h4 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <span class="bg-brand-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">3</span>
+                        100% 無購物站與透明定價策略
+                    </h4>
+                    <p>
+                        徹底宣示「不走購物站」，將景點時間還給旅客。取而代之的是安排 Big C 超市、ICONSIAM、Central World 等自由消費場所。以 NT$43,800 - $50,800 的真實反映成本定價，建立誠信品牌護城河。
+                    </p>
+                </div>
+
+                <!-- Insight 4 -->
+                <div class="space-y-3 bg-sand-50 p-5 rounded-xl border border-sand-200">
+                    <h4 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <span class="bg-brand-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">4</span>
+                        視覺系社群美學與米其林美食植入
+                    </h4>
+                    <p>
+                        導入「大城動物園吉普車長頸鹿拍照」、Bubble In The Forest 網美咖啡廳、鄭王廟泰服體驗與 Space & Time Cube 沉浸場館；餐飲升級為昭披耶河遊船、五星海鮮吃到飽及清邁米其林推薦小吃，大幅提升旅遊體驗價值。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-3">
+            <p>2027 曼谷幫春節過年 Thailand Mini Tour 行程比較與決策系統</p>
+            <p class="text-slate-500">資料來源：走跳旅遊（曼谷幫）羊羊得意專案產品頁與產業分析報告。本頁面為互動式分析與導覽工具。</p>
+        </div>
+    </footer>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-sand-100 px-6 py-4 border-b border-sand-200 flex justify-between items-center">
+                <h3 id="modal-title" class="font-bold text-slate-900 text-base sm:text-lg">行程詳細資訊</h3>
+                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-800 text-2xl font-bold focus:outline-none">&times;</button>
+            </div>
+            <div id="modal-body" class="p-6 space-y-4 overflow-y-auto text-xs sm:text-sm text-slate-700">
+                <!-- Modal content rendered via JS -->
+            </div>
+            <div class="bg-sand-50 px-6 py-3 border-t border-sand-200 flex justify-end space-x-3">
+                <button onclick="closeModal()" class="px-4 py-2 bg-sand-200 text-slate-700 rounded-lg text-xs font-semibold hover:bg-sand-300">關閉</button>
+                <a id="modal-link-btn" href="#" target="_blank" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-xs font-semibold hover:bg-brand-700">前往官方頁面預訂</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // Data Base: 11 Flagship Tours with details provided in user prompt & source document
+        const toursData = [
+            {
+                id: "A團",
+                name: "【羊羊得意過年Ａ團】曼谷＋大城＋芭達雅6 日遊",
+                route: "曼谷＋大城＋芭達雅",
+                regionKey: "曼大芭",
+                date: "2/4",
+                days: 6,
+                airline: "中華航空",
+                airType: "FSC",
+                depCity: "TPE",
+                price: 49800,
+                hotels: "Jasmine 59 Hotel / Veranda Resort Pattaya / Avani Ratchada",
+                highlights: "頂級旗艦標準型、長頸鹿吉普車拍照、鄭王廟泰服體驗、昭披耶河遊船、水豚互動",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-1/"
+            },
+            {
+                id: "B團",
+                name: "【羊羊得意過年Ｂ團】曼谷＋華欣＋安帕瓦6 日遊",
+                route: "曼谷＋華欣＋安帕瓦",
+                regionKey: "華欣",
+                date: "2/5",
+                days: 6,
+                airline: "泰國航空",
+                airType: "FSC",
+                depCity: "TPE",
+                price: 50800,
+                hotels: "Holiday Inn Vana Nava / 曼谷國際五星飯店",
+                highlights: "全系列最高價尊榮型、華欣水上叢林樂園、THE SKY高空酒吧、美功鐵道與雙水上市場",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-2/"
+            },
+            {
+                id: "C團",
+                name: "【羊羊得意過年Ｃ團】曼谷＋芭達雅5 日遊",
+                route: "曼谷＋芭達雅 (短天數)",
+                regionKey: "都會",
+                date: "2/7",
+                days: 5,
+                airline: "長榮 / 華航 / 泰航",
+                airType: "FSC",
+                depCity: "TPE",
+                price: 48800,
+                hotels: "Jasmine 59 Hotel / Samsara Hotel Pattaya",
+                highlights: "大年初二出發早去午回、賽佛瑞野生動物園、海洋天空號遊輪晚餐、米其林青木瓜沙拉名店",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-3/"
+            },
+            {
+                id: "E團",
+                name: "【羊羊得意過年Ｅ團】清邁＋清萊＋米其林在地美食5+1 日遊",
+                route: "清邁＋清萊 (泰北)",
+                regionKey: "泰北",
+                date: "2/4",
+                days: 6,
+                airline: "亞洲航空",
+                airType: "LCC",
+                depCity: "TPE",
+                price: 46500,
+                hotels: "清邁連鎖精品飯店 / 清萊特色度假村",
+                highlights: "泰北深度文化、米其林黑森林圍爐晚餐、恐龍油條、清萊白廟藍廟、阿卡山谷羊場",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-5/"
+            },
+            {
+                id: "F團",
+                name: "【羊羊得意過年Ｆ團】清邁＋清萊＋米其林在地美食5+1 日遊",
+                route: "清邁＋清萊 (泰北)",
+                regionKey: "泰北",
+                date: "2/5",
+                days: 6,
+                airline: "亞洲航空",
+                airType: "LCC",
+                depCity: "TPE",
+                price: 46200,
+                hotels: "清邁連鎖精品飯店 / 清萊特色度假村",
+                highlights: "正宗除夕出發泰北線、米其林在地美食巡禮、黑森林餐廳圍爐、白廟藍廟震撼美學",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-6/"
+            },
+            {
+                id: "H團",
+                name: "【羊羊得意過年Ｈ團】曼谷＋大城＋芭達雅6 日遊",
+                route: "曼谷＋大城＋芭達雅",
+                regionKey: "曼大芭",
+                date: "2/4",
+                days: 6,
+                airline: "亞洲航空",
+                airType: "LCC",
+                depCity: "TPE",
+                price: 45800,
+                hotels: "Avani Ratchada / One Patio Pattaya / Jasmine 59",
+                highlights: "高 CP 值經典款、配備亞航壓低團費、大城動物園、 Bubble In The Forest 網美咖啡",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-8/"
+            },
+            {
+                id: "I團",
+                name: "【羊羊得意過年Ｉ團】曼谷＋芭達雅5+1 日遊",
+                route: "曼谷＋芭達雅 (都會)",
+                regionKey: "都會",
+                date: "2/4",
+                days: 6,
+                airline: "泰國獅子航空",
+                airType: "LCC",
+                depCity: "TPE",
+                price: 44800,
+                hotels: "Jasmine Grande Residence / Samsara Hotel",
+                highlights: "預算先決都會型、捨棄大城長途拉車、悠閒行程、芭達雅洞穴風海景餐廳、海鮮吃到飽",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-9/"
+            },
+            {
+                id: "K團",
+                name: "【羊羊得意-高雄出發Ｋ團】曼谷＋大城＋芭達雅6 日遊",
+                route: "曼谷＋大城＋芭達雅",
+                regionKey: "曼大芭",
+                date: "2/4",
+                days: 6,
+                airline: "泰國獅子航空",
+                airType: "LCC",
+                depCity: "KHH",
+                price: 44800,
+                hotels: "Avani Ratchada / Samsara Hotel / Jasmine Grande",
+                highlights: "南部鄉親專屬高雄小港直飛、免除北上免搭高鐵負擔、完整黃金三角精華景點",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-11/"
+            },
+            {
+                id: "L團",
+                name: "【羊羊得意過年Ｌ團】曼谷＋大城＋芭達雅6 日遊",
+                route: "曼谷＋大城＋芭達雅",
+                regionKey: "曼大芭",
+                date: "2/5",
+                days: 6,
+                airline: "泰國獅子航空",
+                airType: "LCC",
+                depCity: "TPE",
+                price: 46800,
+                hotels: "Jasmine Grande / Samsara / TRIBE Living Sukhumvit 39",
+                highlights: "除夕當天出發首選、光海鮮年夜圍爐晚餐、潮牌飯店 TRIBE 入住、大城動物園",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-12/"
+            },
+            {
+                id: "M團",
+                name: "【羊羊得意過年Ｍ團】曼谷＋華欣＋水上市場5+1 日遊",
+                route: "曼谷＋華欣＋水上市場",
+                regionKey: "華欣",
+                date: "2/4",
+                days: 6,
+                airline: "泰國獅子航空",
+                airType: "LCC",
+                depCity: "TPE",
+                price: 44500,
+                hotels: "Veranda Resort & Villas Hua Hin / 曼谷連鎖飯店",
+                highlights: "親子生態休閒首選、華欣野生動物園、Cicada 文創夜市、德國豬腳啤酒晚餐",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-13/"
+            },
+            {
+                id: "N團",
+                name: "【羊羊得意過年Ｎ團】曼谷＋大城＋芭達雅6 日遊",
+                route: "曼谷＋大城＋芭達雅",
+                regionKey: "曼大芭",
+                date: "2/5",
+                days: 6,
+                airline: "泰國獅子航空",
+                airType: "LCC",
+                depCity: "TPE",
+                price: 46800,
+                hotels: "Jasmine Resort / Samsara / TRIBE Living Sukhumvit 39",
+                highlights: "L團孿生分流產品、除夕當天午去早回、圍爐享用光海鮮盛宴、時空魔方沉浸體驗",
+                url: "https://goplaytravel.com.tw/product/minitour-thai-sp-2027lunaryear-14/"
+            }
+        ];
+
+        // Global State
+        let currentFilteredTours = [...toursData];
+        let sortDirection = { column: null, asc: true };
+        let wizardSelection = { flight: null, style: null };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            initMobileMenu();
+            initCharts();
+            renderTourCards(toursData);
+            renderMatrixTable(toursData);
+            setupFilterListeners();
+        });
+
+        // Mobile Menu Toggle
+        function initMobileMenu() {
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+        }
+
+        // Render Chart.js Visualizations
+        function initCharts() {
+            // Chart 1: Price Comparison
+            const priceCtx = document.getElementById('priceChart').getContext('2d');
+            const tourLabels = toursData.map(t => t.id);
+            const tourPrices = toursData.map(t => t.price);
+            const tourColors = toursData.map(t => t.airType === 'FSC' ? '#3b82f6' : '#f97316');
+
+            new Chart(priceCtx, {
+                type: 'bar',
+                data: {
+                    labels: tourLabels,
+                    datasets: [{
+                        label: '團費 (NT$)',
+                        data: tourPrices,
+                        backgroundColor: tourColors,
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const tour = toursData[context.dataIndex];
+                                    return `團費: NT$ ${tour.price.toLocaleString()} (${tour.airline})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 40000,
+                            max: 52000,
+                            ticks: {
+                                callback: (val) => '$' + val.toLocaleString()
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Destination Distribution Donut
+            const regionCtx = document.getElementById('regionChart').getContext('2d');
+            const regionCounts = {
+                '曼谷+大城+芭達雅': toursData.filter(t => t.regionKey === '曼大芭').length,
+                '曼谷+華欣度假': toursData.filter(t => t.regionKey === '華欣').length,
+                '清邁+清萊 (泰北)': toursData.filter(t => t.regionKey === '泰北').length,
+                '短天數都會型': toursData.filter(t => t.regionKey === '都會').length,
+            };
+
+            new Chart(regionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(regionCounts),
+                    datasets: [{
+                        data: Object.values(regionCounts),
+                        backgroundColor: ['#c87d55', '#10b981', '#8b5cf6', '#06b6d4'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 12, font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render Dynamic Tour Cards
+        function renderTourCards(tours) {
+            const container = document.getElementById('tour-cards-container');
+            container.innerHTML = '';
+
+            if (tours.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 bg-white rounded-xl border border-sand-200">沒有符合條件的團型，請重置篩選條件。</div>`;
+                return;
+            }
+
+            tours.forEach(tour => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-sand-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden";
+                card.innerHTML = `
+                    <div class="p-5 space-y-3">
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="bg-brand-100 text-brand-800 font-extrabold px-2.5 py-1 rounded-md text-xs">${tour.id}</span>
+                            <span class="${tour.airType === 'FSC' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'} text-xs font-semibold px-2 py-0.5 rounded">
+                                ${tour.airline} (${tour.depCity === 'KHH' ? '高雄出發' : '台北出發'})
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm leading-snug">${tour.name}</h4>
+                        <div class="text-xs text-slate-500 space-y-1">
+                            <div>&#128197; <strong>出發日期：</strong> 2027/0${tour.date} (${tour.days}天)</div>
+                            <div>&#127976; <strong>飯店配置：</strong> ${tour.hotels}</div>
+                            <div>&#10024; <strong>主要亮點：</strong> ${tour.highlights}</div>
+                        </div>
+                    </div>
+                    <div class="px-5 py-3 bg-sand-50 border-t border-sand-200 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs text-slate-500">參考團費</span>
+                            <div class="text-lg font-extrabold text-brand-700">NT$ ${tour.price.toLocaleString()}</div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="openModal('${tour.id}')" class="px-3 py-1.5 bg-sand-200 hover:bg-sand-300 text-slate-800 rounded-lg text-xs font-semibold transition-colors">
+                                詳細資訊
+                            </button>
+                            <a href="${tour.url}" target="_blank" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1">
+                                產品官網 &#10132;
+                            </a>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Render Comprehensive Matrix Table
+        function renderMatrixTable(tours) {
+            const tbody = document.getElementById('matrix-table-body');
+            tbody.innerHTML = '';
+
+            tours.forEach(tour => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-sand-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-brand-700">${tour.id}</td>
+                    <td class="p-3 font-medium text-slate-800">${tour.route}</td>
+                    <td class="p-3">2/0${tour.date}</td>
+                    <td class="p-3">${tour.days} 天</td>
+                    <td class="p-3">
+                        <span class="${tour.airType === 'FSC' ? 'text-blue-600 font-medium' : 'text-amber-600 font-medium'}">
+                            ${tour.airline}
+                        </span>
+                        <span class="text-slate-400 text-xs">(${tour.depCity})</span>
+                    </td>
+                    <td class="p-3 font-bold text-slate-900">$${tour.price.toLocaleString()}</td>
+                    <td class="p-3 text-xs text-slate-600 max-w-xs truncate" title="${tour.hotels}">${tour.hotels}</td>
+                    <td class="p-3 text-center">
+                        <a href="${tour.url}" target="_blank" class="text-brand-600 hover:text-brand-800 font-semibold underline text-xs">
+                            前往連結 &#10138;
+                        </a>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Setup Interactive Filters
+        function setupFilterListeners() {
+            const airSelect = document.getElementById('filter-airline');
+            const depSelect = document.getElementById('filter-departure');
+            const dateSelect = document.getElementById('filter-date');
+            const regionSelect = document.getElementById('filter-region');
+            const resetBtn = document.getElementById('reset-filters');
+            const searchInput = document.getElementById('table-search');
+
+            function applyFilters() {
+                const airVal = airSelect.value;
+                const depVal = depSelect.value;
+                const dateVal = dateSelect.value;
+                const regionVal = regionSelect.value;
+
+                currentFilteredTours = toursData.filter(tour => {
+                    if (airVal !== 'ALL' && tour.airType !== airVal) return false;
+                    if (depVal !== 'ALL' && tour.depCity !== depVal) return false;
+                    if (dateVal !== 'ALL' && tour.date !== dateVal) return false;
+                    if (regionVal !== 'ALL' && tour.regionKey !== regionVal) return false;
+                    return true;
+                });
+
+                document.getElementById('filtered-count').innerText = `共顯示 ${currentFilteredTours.length} 個符合條件的行程`;
+                renderTourCards(currentFilteredTours);
+                renderMatrixTable(currentFilteredTours);
+            }
+
+            airSelect.addEventListener('change', applyFilters);
+            depSelect.addEventListener('change', applyFilters);
+            dateSelect.addEventListener('change', applyFilters);
+            regionSelect.addEventListener('change', applyFilters);
+
+            resetBtn.addEventListener('click', () => {
+                airSelect.value = 'ALL';
+                depSelect.value = 'ALL';
+                dateSelect.value = 'ALL';
+                regionSelect.value = 'ALL';
+                searchInput.value = '';
+                applyFilters();
+            });
+
+            // Table Quick Search
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                const searched = currentFilteredTours.filter(tour => 
+                    tour.name.toLowerCase().includes(query) ||
+                    tour.airline.toLowerCase().includes(query) ||
+                    tour.highlights.toLowerCase().includes(query) ||
+                    tour.hotels.toLowerCase().includes(query) ||
+                    tour.id.toLowerCase().includes(query)
+                );
+                renderMatrixTable(searched);
+            });
+        }
+
+        // Table Column Sort
+        function sortTable(columnKey) {
+            if (sortDirection.column === columnKey) {
+                sortDirection.asc = !sortDirection.asc;
+            } else {
+                sortDirection.column = columnKey;
+                sortDirection.asc = true;
+            }
+
+            currentFilteredTours.sort((a, b) => {
+                let valA = a[columnKey];
+                let valB = b[columnKey];
+
+                if (typeof valA === 'string') {
+                    return sortDirection.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else {
+                    return sortDirection.asc ? valA - valB : valB - valA;
+                }
+            });
+
+            renderMatrixTable(currentFilteredTours);
+        }
+
+        // Modal Handler
+        function openModal(tourId) {
+            const tour = toursData.find(t => t.id === tourId);
+            if (!tour) return;
+
+            document.getElementById('modal-title').innerText = `${tour.id} - ${tour.name}`;
+            document.getElementById('modal-link-btn').href = tour.url;
+
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2 bg-sand-50 p-3 rounded-lg border border-sand-200">
+                        <div><strong>定價：</strong> NT$ ${tour.price.toLocaleString()}</div>
+                        <div><strong>航空：</strong> ${tour.airline} (${tour.airType})</div>
+                        <div><strong>出發地點：</strong> ${tour.depCity === 'KHH' ? '高雄小港' : '台北桃園'}</div>
+                        <div><strong>出發日期：</strong> 2027 / 0${tour.date} (${tour.days}天)</div>
+                    </div>
+                    <div>
+                        <strong class="text-slate-900">核心飯店安排：</strong>
+                        <p class="text-slate-600 mt-0.5">${tour.hotels}</p>
+                    </div>
+                    <div>
+                        <strong class="text-slate-900">行程特色亮點解構：</strong>
+                        <p class="text-slate-600 mt-0.5 leading-relaxed">${tour.highlights}</p>
+                    </div>
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs">
+                        &#128161; <strong>小幫手建議：</strong> 專案適用「10月30日前付訂早鳥折扣 $3,000元/人」優惠。滿 8 人即自成團，享全程 VIP 豪華保姆車包車服務。
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        // Recommendation Wizard Handler
+        function setWizardPref(type, value) {
+            wizardSelection[type] = value;
+
+            // Highlight selected button UI
+            const btns = document.querySelectorAll(`.wiz-btn-${type}`);
+            btns.forEach(btn => btn.classList.remove('border-brand-600', 'bg-brand-50'));
+
+            event.currentTarget.classList.add('border-brand-600', 'bg-brand-50');
+
+            // Check if recommendation can be calculated
+            if (wizardSelection.flight && wizardSelection.style) {
+                calculateRecommendation();
+            }
+        }
+
+        function calculateRecommendation() {
+            let matched = [];
+            const { flight, style } = wizardSelection;
+
+            if (flight === 'KHH') {
+                matched = toursData.filter(t => t.id === 'K團');
+            } else if (style === 'NORTH') {
+                matched = toursData.filter(t => t.regionKey === '泰北');
+            } else if (style === 'RESORT') {
+                matched = toursData.filter(t => t.regionKey === '華欣');
+            } else if (style === 'URBAN') {
+                matched = toursData.filter(t => t.regionKey === '都會');
+            } else {
+                // CLASSIC
+                if (flight === 'FSC_TPE') {
+                    matched = toursData.filter(t => t.id === 'A團');
+                } else {
+                    matched = toursData.filter(t => ['H團', 'L團', 'N團'].includes(t.id));
+                }
+            }
+
+            const resultDiv = document.getElementById('wizard-result');
+            const resultContent = document.getElementById('wizard-result-content');
+            resultDiv.classList.remove('hidden');
+
+            if (matched.length > 0) {
+                resultContent.innerHTML = matched.map(t => `
+                    <div class="p-3 bg-white rounded-lg border border-sand-200 flex justify-between items-center my-1">
+                        <div>
+                            <span class="font-bold text-brand-700">${t.id}</span> - ${t.name}
+                            <div class="text-slate-500">${t.airline} | 2/0${t.date}出發 | NT$ ${t.price.toLocaleString()}</div>
+                        </div>
+                        <a href="${t.url}" target="_blank" class="px-3 py-1 bg-brand-600 text-white rounded text-xs font-semibold hover:bg-brand-700">
+                            預訂連結 &#10132;
+                        </a>
+                    </div>
+                `).join('');
+            } else {
+                resultContent.innerText = '未找到完全符合特性的團型，建議參考【A團】或【H團】經典全能型方案！';
+            }
+        }
+    </script>
+</body>
+</html>
