@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英語聽力拼字測驗 (20題挑戰)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 14px rgba(99, 102, 241, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        .playing-audio {
+            animation: pulse-ring 1.8s infinite;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-slate-800 bg-slate-950/80 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-spell-check"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-100 leading-tight">Spelling Master</h1>
+                    <p class="text-xs text-slate-400">課本單字聽力測驗 (資料庫：<span id="header-total-words">216</span> 字)</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="openWordBankModal()" class="px-3.5 py-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-xs font-semibold rounded-xl border border-indigo-500/30 flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-database"></i> 字庫管理
+                </button>
+                <div id="quiz-badge" class="hidden px-3 py-1 bg-indigo-500/20 text-indigo-300 text-xs font-semibold rounded-full border border-indigo-500/30">
+                    <i class="fa-solid fa-list-check mr-1"></i> <span id="header-progress">0 / 20</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-3xl w-full mx-auto px-4 py-8 flex-grow flex items-center justify-center">
+
+        <!-- 1. START SCREEN -->
+        <div id="start-screen" class="w-full glass-card bg-slate-800/90 border border-slate-700/60 rounded-3xl p-6 sm:p-10 shadow-2xl text-center">
+            <div class="w-20 h-20 bg-indigo-500/10 border border-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-400 text-3xl">
+                <i class="fa-solid fa-headphones-simple"></i>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">英文聽力拼字挑戰</h2>
+            <p class="text-slate-300 mb-6 max-w-md mx-auto text-sm sm:text-base leading-relaxed">
+                系統將從單字庫的 <strong id="start-total-words" class="text-indigo-400">216 個單字</strong> 中隨機抽出 <strong>20 題</strong>（若字庫不足 20 字則全抽）。<br>
+                每題會自動切換 <span class="text-indigo-300 font-semibold">美式 🇺🇸、英式 🇬🇧、澳洲 🇦🇺</span> 三種真人自然口音各朗讀一次！
+            </p>
+
+            <div class="bg-slate-900/60 rounded-2xl p-4 mb-8 border border-slate-700/50 max-w-md mx-auto text-left text-xs text-slate-400 space-y-2">
+                <div class="flex items-start">
+                    <i class="fa-solid fa-check text-emerald-400 mt-0.5 mr-2"></i>
+                    <span><strong>三次口音朗讀：</strong> 幫助適應國際標準英語發音。</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fa-solid fa-check text-emerald-400 mt-0.5 mr-2"></i>
+                    <span><strong>自由管理單字庫：</strong> 可點選右上角「字庫管理」自訂或擴充英文單字。</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fa-solid fa-check text-emerald-400 mt-0.5 mr-2"></i>
+                    <span><strong>全測驗結束才計分：</strong> 答題過程中不提示對錯，模擬真實測驗體驗。</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-3">
+                <button onclick="startQuiz()" class="px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transition duration-200 transform hover:-translate-y-0.5 active:translate-y-0 text-lg">
+                    <i class="fa-solid fa-play mr-2"></i> 開始測驗
+                </button>
+                <button onclick="openWordBankModal()" class="px-6 py-4 bg-slate-700/60 hover:bg-slate-700 text-indigo-300 font-semibold rounded-2xl border border-indigo-500/20 transition text-base">
+                    <i class="fa-solid fa-sliders mr-2"></i> 管理單字庫
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. QUIZ SCREEN -->
+        <div id="quiz-screen" class="w-full hidden glass-card bg-slate-800/90 border border-slate-700/60 rounded-3xl p-6 sm:p-10 shadow-2xl">
+            <!-- Progress Bar -->
+            <div class="mb-8">
+                <div class="flex justify-between items-center text-sm font-semibold mb-2">
+                    <span class="text-slate-400">題目進度</span>
+                    <span class="text-indigo-400"><span id="current-q-num">1</span> / 20</span>
+                </div>
+                <div class="w-full bg-slate-700/60 h-3 rounded-full overflow-hidden">
+                    <div id="progress-bar-inner" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Audio Controller Box -->
+            <div class="bg-slate-900/80 rounded-2xl p-6 mb-8 border border-slate-700/80 text-center relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">語音聽力區</span>
+                    <!-- Audio Engine Toggle Switch -->
+                    <div class="flex items-center space-x-1.5 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                        <button type="button" id="engine-native-btn" onclick="setAudioEngine('native')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-indigo-600 text-white transition">
+                            系統語音
+                        </button>
+                        <button type="button" id="engine-cloud-btn" onclick="setAudioEngine('cloud')" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition">
+                            雲端發音 ☁️
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Audio Wave Visualizer & Play Button -->
+                <div class="flex justify-center items-center my-4">
+                    <button id="main-play-btn" type="button" onclick="playCurrentWordAudioSequence()" class="w-20 h-20 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full flex items-center justify-center text-3xl shadow-xl transition-all duration-200 focus:outline-none">
+                        <i id="main-play-icon" class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+
+                <div id="audio-status-pill" class="inline-flex items-center space-x-2 px-4 py-1.5 bg-slate-800 rounded-full text-xs text-indigo-300 font-medium border border-indigo-500/30">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="audio-status-text">點擊上方按鈕播放發音</span>
+                </div>
+
+                <!-- Individual Accent Replay Buttons -->
+                <div class="mt-6 pt-4 border-t border-slate-800 flex flex-wrap justify-center gap-2">
+                    <button type="button" onclick="playSingleAccent('us')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-medium text-slate-300 border border-slate-700 flex items-center">
+                        🇺🇸 美音 (US)
+                    </button>
+                    <button type="button" onclick="playSingleAccent('uk')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-medium text-slate-300 border border-slate-700 flex items-center">
+                        🇬🇧 英音 (UK)
+                    </button>
+                    <button type="button" onclick="playSingleAccent('au')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-medium text-slate-300 border border-slate-700 flex items-center">
+                        🇦🇺 澳音 (AU)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Answer Input Form -->
+            <form onsubmit="handleNextQuestion(event)" class="space-y-4">
+                <div>
+                    <label for="user-input" class="block text-sm font-semibold text-slate-300 mb-2">請輸入您聽到的英文單字：</label>
+                    <input type="text" id="user-input" autocomplete="off" spellcheck="false" placeholder="在此輸入拼字..." 
+                        class="w-full px-5 py-4 bg-slate-900 border-2 border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 rounded-2xl text-xl font-bold text-white tracking-wide placeholder-slate-600 outline-none transition-all duration-200">
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="skipQuestion()" class="w-1/3 py-4 bg-slate-700/60 hover:bg-slate-700 text-slate-300 font-semibold rounded-2xl transition duration-150">
+                        略過
+                    </button>
+                    <button type="submit" class="w-2/3 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/30 transition duration-150 text-base">
+                        下一題 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 3. RESULTS SCREEN -->
+        <div id="results-screen" class="w-full hidden glass-card bg-slate-800/90 border border-slate-700/60 rounded-3xl p-6 sm:p-10 shadow-2xl">
+            <!-- Score Header -->
+            <div class="text-center mb-8 border-b border-slate-700/60 pb-8">
+                <div class="inline-block p-4 rounded-full bg-slate-900 border border-slate-700 mb-4">
+                    <div id="score-circle" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex flex-col items-center justify-center text-white shadow-lg">
+                        <span id="final-score-text" class="text-3xl sm:text-4xl font-extrabold leading-none">0</span>
+                        <span id="score-total-text" class="text-xs text-indigo-200 mt-1 font-medium">/ 20 題</span>
+                    </div>
+                </div>
+                <h2 id="result-title" class="text-2xl font-bold text-white mb-1">測驗完成！</h2>
+                <p id="result-subtitle" class="text-slate-400 text-sm">以下是您本次測驗的詳細結果回顧：</p>
+            </div>
+
+            <!-- Detailed Answer Breakdown List -->
+            <div class="space-y-3 max-h-[380px] overflow-y-auto pr-2 mb-8 custom-scrollbar">
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex justify-between px-1">
+                    <span>題號 / 正確單字</span>
+                    <span>您的回答 / 結果</span>
+                </div>
+                <div id="results-list" class="space-y-2">
+                    <!-- Dynamic Result Item Template will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="startQuiz()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/30 transition duration-150 text-center">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> 重新開始新一輪測驗
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 4. WORD BANK MANAGEMENT MODAL -->
+    <div id="word-bank-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card bg-slate-800/95 border border-slate-700 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-slate-700/80 flex items-center justify-between bg-slate-900/50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-white">單字庫管理</h3>
+                        <p class="text-xs text-slate-400">目前共有 <span id="modal-word-count" class="text-indigo-400 font-semibold">0</span> 個測驗單字</p>
+                    </div>
+                </div>
+                <button onclick="closeWordBankModal()" class="w-8 h-8 rounded-full bg-slate-700/60 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-5 space-y-4 overflow-y-auto flex-grow custom-scrollbar">
+                <!-- Add New Word Box -->
+                <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-700/70">
+                    <label class="block text-xs font-semibold text-slate-300 mb-2">新增單字（支援單一單字，或多個單字以逗號、空格隔開）：</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-word-input" placeholder="例如: apple, banana, orange" 
+                            onkeydown="if(event.key === 'Enter') addNewWordsFromInput()"
+                            class="flex-grow px-4 py-2.5 bg-slate-800 border border-slate-700 focus:border-indigo-500 rounded-xl text-sm text-white outline-none">
+                        <button onclick="addNewWordsFromInput()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition shrink-0">
+                            <i class="fa-solid fa-plus mr-1"></i> 新增
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search & Actions Bar -->
+                <div class="flex flex-col sm:flex-row gap-2 justify-between items-center pt-2">
+                    <div class="relative w-full sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-xs text-slate-400"></i>
+                        <input type="text" id="search-word-input" oninput="filterWordBankList()" placeholder="搜尋字庫單字..." 
+                            class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button onclick="resetToDefaultWordList()" class="px-3 py-2 bg-slate-700/60 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition flex items-center justify-center gap-1 w-1/2 sm:w-auto">
+                            <i class="fa-solid fa-rotate-left"></i> 重設為預設 (216字)
+                        </button>
+                        <button onclick="clearAllWords()" class="px-3 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-medium transition flex items-center justify-center gap-1 w-1/2 sm:w-auto">
+                            <i class="fa-solid fa-trash-can"></i> 清空字庫
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Word Tags Grid -->
+                <div id="word-tags-container" class="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto p-3 bg-slate-900/50 rounded-2xl border border-slate-800">
+                    <!-- Dynamic Word Pills -->
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-slate-700/80 bg-slate-900/50 text-right">
+                <button onclick="closeWordBankModal()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">
+                    完成
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-800/80">
+        教材聽力測驗系統 &copy; 單字庫可自訂擴充
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // 1. DEFAULT 216 EXTRACTED WORDS FROM THE STEP 1 IMAGES
+        const DEFAULT_WORD_DATABASE = [
+            // IMG_1783
+            "golf", "gift", "raft", "left", "soft", "elf", "belt", "help", "lift", "felt", "shelf", "melt", "shift", "wolf",
+            // IMG_1778
+            "chain", "train", "clay", "stay", "sail", "say", "hay", "pay", "pail", "plain", "tray", "trail", "claim", "main", "rain", "ray", "braid", "brain", "grain", "stain", "away",
+            // IMG_1781
+            "knee", "knot", "know", "wrap", "wrong", "wrist", "knob", "knit", "wrote", "write", "knife", "knock",
+            // IMG_1782
+            "spring", "street", "scream", "scrap", "strap", "spray", "scrub", "split", "screen", "stream", "stray", "splash", "string", "strange", "scratch",
+            // IMG_1779
+            "sight", "sigh", "high", "bright", "flight", "tight", "straight", "eight", "night", "right", "light", "might", "fight", "knight",
+            // IMG_1777
+            "heel", "heat", "heap", "seems", "seats", "seams", "meeting", "meatball", "meadow", "seal", "seed", "seek", "leap", "leaves", "leak", "sleep", "cheap", "sheep", "bread", "beads", "beach", "been", "beak", "beef", "bead", "break",
+            // IMG_1780
+            "deck", "duck", "peck", "snack", "stack", "smack", "clock", "click", "cluck", "black", "back", "brick", "rack", "lock", "lack", "lick", "trick", "thick", "track", "chicks", "sticks", "bricks",
+            // IMG_1776
+            "coal", "coat", "crow", "pillow", "shadow", "boast", "toad", "toast", "tow", "goat", "float", "grown", "soak", "slow", "snow", "glow", "groan", "window", "coast", "throw", "throat", "road", "roast", "row"
+        ];
+
+        // Active editable word bank
+        let activeWordBank = [];
+
+        // Load word bank from localStorage or default
+        function initWordBank() {
+            const stored = localStorage.getItem('spelling_quiz_custom_words');
+            if (stored) {
+                try {
+                    activeWordBank = JSON.parse(stored);
+                } catch (e) {
+                    activeWordBank = Array.from(new Set(DEFAULT_WORD_DATABASE));
+                }
+            } else {
+                activeWordBank = Array.from(new Set(DEFAULT_WORD_DATABASE));
+            }
+            updateWordCountBadges();
+        }
+
+        // Save active word bank to localStorage
+        function saveWordBank() {
+            localStorage.setItem('spelling_quiz_custom_words', JSON.stringify(activeWordBank));
+            updateWordCountBadges();
+        }
+
+        // Update UI word counts across header and start screen
+        function updateWordCountBadges() {
+            const count = activeWordBank.length;
+            document.getElementById('header-total-words').innerText = count;
+            document.getElementById('start-total-words').innerText = `${count} 個單字`;
+            document.getElementById('modal-word-count').innerText = count;
+        }
+
+        // Quiz State Variables
+        let quizWords = [];
+        let totalQuizQuestions = 20;
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let currentWordObj = null;
+        let isSequencePlaying = false;
+        let currentAudioSequenceId = 0;
+        let synth = window.speechSynthesis;
+        let voices = [];
+        let audioEngine = 'native'; // 'native' or 'cloud'
+        let currentAudioElement = null;
+
+        // Global array protecting SpeechSynthesisUtterance from iOS WebKit GC Sweep
+        window._activeUtterances = [];
+
+        function setAudioEngine(mode) {
+            audioEngine = mode;
+            const nativeBtn = document.getElementById('engine-native-btn');
+            const cloudBtn = document.getElementById('engine-cloud-btn');
+            if (mode === 'native') {
+                nativeBtn.className = "px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-indigo-600 text-white transition";
+                cloudBtn.className = "px-2.5 py-1 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition";
+            } else {
+                cloudBtn.className = "px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-indigo-600 text-white transition";
+                nativeBtn.className = "px-2.5 py-1 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition";
+            }
+            stopAllAudio();
+        }
+
+        function stopAllAudio() {
+            currentAudioSequenceId++;
+            window._activeUtterances = [];
+            if (typeof speechSynthesis !== 'undefined') {
+                try {
+                    speechSynthesis.cancel();
+                    speechSynthesis.resume();
+                } catch(e){}
+            }
+            if (currentAudioElement) {
+                try {
+                    currentAudioElement.pause();
+                    currentAudioElement.currentTime = 0;
+                } catch(e){}
+                currentAudioElement = null;
+            }
+            isSequencePlaying = false;
+            resetPlayButtonUI();
+        }
+
+        function resetPlayButtonUI() {
+            const playBtn = document.getElementById('main-play-btn');
+            const playIcon = document.getElementById('main-play-icon');
+            if (playBtn && playIcon) {
+                playBtn.classList.remove('playing-audio');
+                playIcon.className = "fa-solid fa-volume-high";
+            }
+        }
+
+        // Load voices when available
+        function updateVoices() {
+            if (typeof speechSynthesis !== 'undefined') {
+                voices = speechSynthesis.getVoices();
+            }
+        }
+        updateVoices();
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = updateVoices;
+        }
+
+        // Shuffle helper
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Start Quiz Procedure
+        function startQuiz() {
+            if (activeWordBank.length === 0) {
+                alert('您的單字庫目前是空的！請先點擊「字庫管理」新增單字。');
+                openWordBankModal();
+                return;
+            }
+
+            totalQuizQuestions = Math.min(20, activeWordBank.length);
+            const shuffled = shuffleArray(activeWordBank);
+            quizWords = shuffled.slice(0, totalQuizQuestions);
+            currentQuestionIndex = 0;
+            userAnswers = [];
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('quiz-badge').classList.remove('hidden');
+
+            loadQuestion(0);
+        }
+
+        // Load specific question
+        function loadQuestion(index) {
+            stopAllAudio();
+            currentQuestionIndex = index;
+            const word = quizWords[index];
+            currentWordObj = { index: index + 1, word: word };
+
+            document.getElementById('header-progress').innerText = `${index + 1} / ${totalQuizQuestions}`;
+            document.getElementById('current-q-num').innerText = index + 1;
+            const progressPercent = ((index + 1) / totalQuizQuestions) * 100;
+            document.getElementById('progress-bar-inner').style.width = `${progressPercent}%`;
+
+            const inputEl = document.getElementById('user-input');
+            inputEl.value = '';
+            inputEl.focus();
+
+            setTimeout(() => {
+                playCurrentWordAudioSequence();
+            }, 250);
+        }
+
+        // Voice matching helper
+        function getVoiceAndSettingsForAccent(accentCode, customPitch, customRate) {
+            updateVoices();
+            let targetLangs = [];
+            let nameKeywords = [];
+            let pitch = customPitch || 1.0;
+            let rate = customRate || 0.9;
+
+            if (accentCode === 'us') {
+                targetLangs = ['en-us', 'en_us'];
+                nameKeywords = ['us', 'united states', 'american', 'samantha', 'alex', 'zira', 'david', 'ava'];
+            } else if (accentCode === 'uk') {
+                targetLangs = ['en-gb', 'en_gb', 'en-ie'];
+                nameKeywords = ['uk', 'great britain', 'british', 'daniel', 'hazel', 'george', 'serena', 'oliver'];
+                pitch = customPitch || 1.15;
+                rate = customRate || 0.85;
+            } else if (accentCode === 'au') {
+                targetLangs = ['en-au', 'en_au', 'en-nz'];
+                nameKeywords = ['australia', 'australian', 'au', 'karen', 'catherine', 'gordon', 'matilda'];
+                pitch = customPitch || 0.9;
+                rate = customRate || 0.95;
+            }
+
+            let selectedVoice = null;
+            if (voices && voices.length > 0) {
+                let matches = voices.filter(v => {
+                    const l = (v.lang || '').toLowerCase().replace('_', '-');
+                    return targetLangs.some(tl => l.startsWith(tl));
+                });
+                if (matches.length === 0) {
+                    matches = voices.filter(v => {
+                        const n = (v.name || '').toLowerCase();
+                        return nameKeywords.some(kw => n.includes(kw)) && (v.lang || '').toLowerCase().startsWith('en');
+                    });
+                }
+                if (matches.length > 0) selectedVoice = matches[0];
+                else {
+                    const anyEn = voices.filter(v => (v.lang || '').toLowerCase().startsWith('en'));
+                    if (anyEn.length > 0) selectedVoice = anyEn[0];
+                }
+            }
+            return { voice: selectedVoice, pitch, rate };
+        }
+
+        // MAIN AUDIO SEQUENCE TRIGGER
+        function playCurrentWordAudioSequence() {
+            if (!currentWordObj) return;
+            stopAllAudio();
+            const sequenceId = currentAudioSequenceId;
+
+            if (audioEngine === 'cloud') {
+                playCloudAudioSequence(currentWordObj.word, sequenceId);
+            } else {
+                playNativeAudioSequence(currentWordObj.word, sequenceId);
+            }
+        }
+
+        // 1. NATIVE SPEECH SYNTHESIS ENGINE (iOS GC-Proof & Synchronous Batch Queuing)
+        function playNativeAudioSequence(word, sequenceId) {
+            if (!('speechSynthesis' in window)) {
+                playCloudAudioSequence(word, sequenceId);
+                return;
+            }
+
+            isSequencePlaying = true;
+            const playBtn = document.getElementById('main-play-btn');
+            const playIcon = document.getElementById('main-play-icon');
+            const statusText = document.getElementById('audio-status-text');
+
+            playBtn.classList.add('playing-audio');
+            playIcon.className = "fa-solid fa-spinner fa-spin";
+            statusText.innerText = "🔊 準備朗讀 3 種口音...";
+
+            if (speechSynthesis.paused) {
+                speechSynthesis.resume();
+            }
+
+            const accents = [
+                { code: 'us', label: '1/3: 美式口音 (US)', pitch: 1.0, rate: 0.9 },
+                { code: 'uk', label: '2/3: 英式口音 (UK)', pitch: 1.15, rate: 0.85 },
+                { code: 'au', label: '3/3: 澳洲口音 (AU)', pitch: 0.9, rate: 0.95 }
+            ];
+
+            window._activeUtterances = [];
+
+            accents.forEach((acc, idx) => {
+                // Add natural speech delay with trailing comma
+                const utt = new SpeechSynthesisUtterance(word + ', ');
+                const { voice, pitch, rate } = getVoiceAndSettingsForAccent(acc.code, acc.pitch, acc.rate);
+
+                utt.rate = rate;
+                utt.pitch = pitch;
+                if (voice) {
+                    utt.voice = voice;
+                    utt.lang = voice.lang;
+                } else {
+                    utt.lang = acc.code === 'uk' ? 'en-GB' : (acc.code === 'au' ? 'en-AU' : 'en-US');
+                }
+
+                utt.onstart = () => {
+                    if (currentAudioSequenceId === sequenceId) {
+                        statusText.innerText = `🔊 ${acc.label}`;
+                    }
+                };
+
+                if (idx === accents.length - 1) {
+                    utt.onend = () => finishSequence(sequenceId, "播放完畢，點擊可重聽");
+                    utt.onerror = () => finishSequence(sequenceId, "播放結束");
+                }
+
+                // Push to global array to prevent WebKit GC
+                window._activeUtterances.push(utt);
+            });
+
+            // Synchronously queue all utterances immediately inside click execution context
+            try {
+                window._activeUtterances.forEach(u => speechSynthesis.speak(u));
+            } catch (e) {
+                console.error("SpeechSynthesis error:", e);
+                finishSequence(sequenceId, "播放完成");
+            }
+
+            // iOS Fallback Timer: Ensure button resets even if iOS forgets onend callback
+            const maxDuration = Math.max(4500, word.length * 900);
+            setTimeout(() => {
+                if (currentAudioSequenceId === sequenceId && isSequencePlaying) {
+                    finishSequence(sequenceId, "播放完畢");
+                }
+            }, maxDuration);
+        }
+
+        // 2. CLOUD AUDIO ENGINE (Alternative fallback engine for 100% stability)
+        async function playCloudAudioSequence(word, sequenceId) {
+            isSequencePlaying = true;
+            const playBtn = document.getElementById('main-play-btn');
+            const playIcon = document.getElementById('main-play-icon');
+            const statusText = document.getElementById('audio-status-text');
+
+            playBtn.classList.add('playing-audio');
+            playIcon.className = "fa-solid fa-spinner fa-spin";
+
+            const accents = [
+                { code: 'en-US', label: '1/3: 雲端美音 (US)' },
+                { code: 'en-GB', label: '2/3: 雲端英音 (UK)' },
+                { code: 'en-AU', label: '3/3: 雲端澳音 (AU)' }
+            ];
+
+            const playAudioPromise = (lang) => {
+                return new Promise((resolve) => {
+                    if (currentAudioSequenceId !== sequenceId) return resolve(false);
+                    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=${lang}&client=tw-ob`;
+                    const audio = new Audio(url);
+                    currentAudioElement = audio;
+
+                    let doneCalled = false;
+                    const done = () => {
+                        if (!doneCalled) {
+                            doneCalled = true;
+                            resolve(currentAudioSequenceId === sequenceId);
+                        }
+                    };
+
+                    audio.onended = done;
+                    audio.onerror = done;
+                    setTimeout(done, 2500);
+
+                    audio.play().catch(done);
+                });
+            };
+
+            for (let i = 0; i < accents.length; i++) {
+                if (currentAudioSequenceId !== sequenceId) break;
+                statusText.innerText = `🔊 ${accents[i].label}`;
+                await playAudioPromise(accents[i].code);
+                if (currentAudioSequenceId !== sequenceId) break;
+                await new Promise(r => setTimeout(r, 350));
+            }
+
+            if (currentAudioSequenceId === sequenceId) {
+                finishSequence(sequenceId, "雲端發音完畢，點擊可重聽");
+            }
+        }
+
+        function finishSequence(sequenceId, msg) {
+            if (currentAudioSequenceId === sequenceId) {
+                isSequencePlaying = false;
+                window._activeUtterances = [];
+                resetPlayButtonUI();
+                const statusText = document.getElementById('audio-status-text');
+                if (statusText) statusText.innerText = msg;
+            }
+        }
+
+        // Play Single Accent
+        function playSingleAccent(accentCode) {
+            if (!currentWordObj) return;
+            stopAllAudio();
+            const word = currentWordObj.word;
+            const sequenceId = currentAudioSequenceId;
+            const statusText = document.getElementById('audio-status-text');
+            
+            if (audioEngine === 'cloud') {
+                const langMap = { us: 'en-US', uk: 'en-GB', au: 'en-AU' };
+                const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=${langMap[accentCode]}&client=tw-ob`;
+                const audio = new Audio(url);
+                currentAudioElement = audio;
+                statusText.innerText = `🔊 重聽雲端 ${accentCode.toUpperCase()} 發音...`;
+                audio.play().catch(() => {});
+            } else {
+                if (!('speechSynthesis' in window)) return;
+                if (speechSynthesis.paused) speechSynthesis.resume();
+
+                const utt = new SpeechSynthesisUtterance(word);
+                const { voice, pitch, rate } = getVoiceAndSettingsForAccent(accentCode);
+                utt.rate = rate;
+                utt.pitch = pitch;
+                if (voice) {
+                    utt.voice = voice;
+                    utt.lang = voice.lang;
+                } else {
+                    utt.lang = accentCode === 'uk' ? 'en-GB' : (accentCode === 'au' ? 'en-AU' : 'en-US');
+                }
+
+                statusText.innerText = `🔊 重聽 ${accentCode.toUpperCase()} 發音...`;
+                window._activeUtterances = [utt];
+                speechSynthesis.speak(utt);
+            }
+        }
+
+        // Handle Next Question Submission
+        function handleNextQuestion(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('user-input');
+            const typedAnswer = inputEl.value.trim().toLowerCase();
+
+            userAnswers.push({
+                questionNum: currentQuestionIndex + 1,
+                targetWord: currentWordObj.word,
+                userAnswer: typedAnswer,
+                isCorrect: typedAnswer === currentWordObj.word.toLowerCase()
+            });
+
+            stopAllAudio();
+
+            if (currentQuestionIndex + 1 >= totalQuizQuestions) {
+                showResults();
+            } else {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+
+        // Skip Question
+        function skipQuestion() {
+            document.getElementById('user-input').value = '';
+            const fakeEvent = { preventDefault: () => {} };
+            handleNextQuestion(fakeEvent);
+        }
+
+        // Show Final Results
+        function showResults() {
+            stopAllAudio();
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('quiz-badge').classList.add('hidden');
+            document.getElementById('results-screen').classList.remove('hidden');
+
+            const correctCount = userAnswers.filter(a => a.isCorrect).length;
+            document.getElementById('final-score-text').innerText = correctCount;
+            document.getElementById('score-total-text').innerText = `/ ${totalQuizQuestions} 題`;
+
+            const titleEl = document.getElementById('result-title');
+            const subTitleEl = document.getElementById('result-subtitle');
+
+            if (correctCount === totalQuizQuestions) {
+                titleEl.innerText = "🎉 完美滿分！太厲害了！";
+                subTitleEl.innerText = `您完全掌握了這 ${totalQuizQuestions} 個單字的聽力與拼字！`;
+            } else if (correctCount >= totalQuizQuestions * 0.75) {
+                titleEl.innerText = "👏 表現優異！";
+                subTitleEl.innerText = "聽力非常出色，請檢視下方做錯的單字。";
+            } else if (correctCount >= totalQuizQuestions * 0.5) {
+                titleEl.innerText = "👍 繼續加油！";
+                subTitleEl.innerText = "已經掌握了一半以上的單字，多聽多練會更厲害。";
+            } else {
+                titleEl.innerText = "💪 加強練習！";
+                subTitleEl.innerText = "建議點擊下方播放鈕重新聽發音並複習拼字。";
+            }
+
+            const listEl = document.getElementById('results-list');
+            listEl.innerHTML = '';
+
+            userAnswers.forEach((ans) => {
+                const item = document.createElement('div');
+                item.className = `flex items-center justify-between p-3.5 rounded-xl border ${
+                    ans.isCorrect ? 'bg-emerald-950/30 border-emerald-500/30' : 'bg-rose-950/30 border-rose-500/30'
+                }`;
+
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 rounded-lg ${ans.isCorrect ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'} flex items-center justify-center font-bold text-xs">
+                            ${ans.questionNum}
+                        </span>
+                        <div>
+                            <div class="font-bold text-white text-base flex items-center gap-2">
+                                <span>${ans.targetWord}</span>
+                                <button type="button" onclick="playSingleAccent('us')" class="text-xs text-indigo-400 hover:text-indigo-300 p-1">
+                                    <i class="fa-solid fa-volume-low"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-semibold ${ans.isCorrect ? 'text-emerald-400' : 'text-rose-400'}">
+                            ${ans.userAnswer ? ans.userAnswer : '<span class="italic text-slate-500 text-xs">(未作答)</span>'}
+                        </div>
+                        <div class="text-[10px] ${ans.isCorrect ? 'text-emerald-500/80' : 'text-rose-400/80'}">
+                            ${ans.isCorrect ? '<i class="fa-solid fa-circle-check"></i> 正確' : `<i class="fa-solid fa-circle-xmark"></i> 應為 ${ans.targetWord}`}
+                        </div>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+
+        // --- 2. WORD BANK MANAGEMENT MODAL FUNCTIONS ---
+
+        function openWordBankModal() {
+            document.getElementById('word-bank-modal').classList.remove('hidden');
+            renderWordBankList();
+        }
+
+        function closeWordBankModal() {
+            document.getElementById('word-bank-modal').classList.add('hidden');
+        }
+
+        function renderWordBankList(searchTerm = '') {
+            const container = document.getElementById('word-tags-container');
+            container.innerHTML = '';
+
+            const filtered = activeWordBank.filter(w => w.toLowerCase().includes(searchTerm.toLowerCase().trim()));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-500 p-4 w-full text-center">查無單字</div>`;
+                return;
+            }
+
+            filtered.forEach(word => {
+                const pill = document.createElement('div');
+                pill.className = 'inline-flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 border border-slate-700/80 hover:border-indigo-500/40 rounded-xl text-xs text-slate-200 transition group';
+                pill.innerHTML = `
+                    <span class="font-semibold">${word}</span>
+                    <button onclick="speakWordWithAccent('${word}', 'us')" class="text-slate-400 hover:text-indigo-300 p-0.5">
+                        <i class="fa-solid fa-volume-low text-[10px]"></i>
+                    </button>
+                    <button onclick="deleteWordFromBank('${word}')" class="text-slate-500 hover:text-rose-400 p-0.5 ml-1 transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                container.appendChild(pill);
+            });
+        }
+
+        function filterWordBankList() {
+            const query = document.getElementById('search-word-input').value;
+            renderWordBankList(query);
+        }
+
+        function addNewWordsFromInput() {
+            const input = document.getElementById('new-word-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Split by commas, spaces, or lines
+            const rawWords = text.split(/[\s,,\n]+/);
+            let addedCount = 0;
+
+            rawWords.forEach(w => {
+                const cleanWord = w.toLowerCase().replace(/[^a-z-]/g, '');
+                if (cleanWord && !activeWordBank.includes(cleanWord)) {
+                    activeWordBank.unshift(cleanWord); // add to top
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                saveWordBank();
+                renderWordBankList(document.getElementById('search-word-input').value);
+                input.value = '';
+            } else {
+                alert('未新增單字（可能格式不符或單字已存在於字庫中）');
+            }
+        }
+
+        function deleteWordFromBank(word) {
+            activeWordBank = activeWordBank.filter(w => w !== word);
+            saveWordBank();
+            renderWordBankList(document.getElementById('search-word-input').value);
+        }
+
+        function resetToDefaultWordList() {
+            if (confirm('確定要將單字庫重設回預設的 216 個課本單字嗎？')) {
+                activeWordBank = Array.from(new Set(DEFAULT_WORD_DATABASE));
+                saveWordBank();
+                document.getElementById('search-word-input').value = '';
+                renderWordBankList();
+            }
+        }
+
+        function clearAllWords() {
+            if (confirm('確定要清空單字庫嗎？')) {
+                activeWordBank = [];
+                saveWordBank();
+                document.getElementById('search-word-input').value = '';
+                renderWordBankList();
+            }
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            initWordBank();
+        };
+
+        // Shortcut listener
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                playCurrentWordAudioSequence();
+            }
+        });
+    </script>
+</body>
+</html>
